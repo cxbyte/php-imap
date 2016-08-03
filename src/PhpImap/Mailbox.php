@@ -523,7 +523,12 @@ class Mailbox {
 			? trim($partStructure->id, " <>")
 			: (isset($params['filename']) || isset($params['name']) ? mt_rand() . mt_rand() : null);
 
-		if($partStructure->ifdisposition) {
+		// ignore contentId on body when mail isn't multipart (https://github.com/barbushin/php-imap/issues/71)
+		if (!$partNum && TYPETEXT === $partStructure->type) {
+			$attachmentId = null;
+		}
+
+		if($attachmentId) {
 			if(empty($params['filename']) && empty($params['name'])) {
 				$fileName = $attachmentId . '.' . strtolower($partStructure->subtype);
 			}
